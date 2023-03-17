@@ -1,19 +1,21 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:smart_cam/tflite/classifier.dart';
+import 'package:smart_cam/tflite/classifier_quant.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:cross_file_image/cross_file_image.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_cam/cam.dart';
-import 'package:smart_cam/tflite/classifier.dart';
-import 'package:smart_cam/tflite/classifier_quant.dart';
-import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
-import 'package:image/image.dart' as img;
+import 'package:smart_cam/objDetect.dart';
+import 'package:smart_cam/textDetect.dart';
 
 class commonUI extends StatefulWidget {
-  const commonUI({super.key, required this.cameraToUse});
+  const commonUI(
+      {super.key, required this.cameraToUse, required this.pageIndex});
   final CameraDescription cameraToUse;
-
+  final int pageIndex;
   @override
   State<commonUI> createState() => _commonUIState();
 }
@@ -28,19 +30,35 @@ class _commonUIState extends State<commonUI> {
   Image? image;
   String? filepath;
   late Classifier _classifier;
-  img.Image? fox;
-  Category? category;
+  late int curPage;
 
   @override
   void initState() {
     super.initState();
+    image = null;
+    filepath = null;
+
+    curPage = widget.pageIndex;
     _classifier = ClassifierQuant();
+  }
+
+  @override
+  void dispose() {
+    image = null;
+    filepath = null;
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width,
         screenHeight = MediaQuery.of(context).size.height;
+    if (curPage != widget.pageIndex) {
+      curPage = widget.pageIndex;
+      image = null;
+      filepath = null;
+    }
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -65,6 +83,8 @@ class _commonUIState extends State<commonUI> {
                 onChanged: (String? value) {
                   setState(() {
                     dropdownValue = value!;
+                    image = null;
+                    filepath = null;
                   });
                 },
                 items: languages
@@ -100,13 +120,26 @@ class _commonUIState extends State<commonUI> {
                           onPressed: () {
                             setState(() {
                               image = null;
+                              filepath = null;
+
                               dialogBox();
                             });
                           },
                         ),
                       )
               ],
-            )
+            ),
+            widget.pageIndex == 0
+                ? filepath == null
+                    ? SizedBox(
+                        height: screenHeight / 3.5,
+                      )
+                    : objDetect(filepath: filepath, classifier: _classifier)
+                : filepath == null
+                    ? SizedBox(
+                        height: screenHeight / 3.5,
+                      )
+                    : textDetect(filepath: filepath)
           ],
         ),
       ),
@@ -196,12 +229,11 @@ class _commonUIState extends State<commonUI> {
       maxHeight: 1800,
     );
     if (pickedFile != null) {
-      filepath = pickedFile.path;
       Uint8List imageByte = await pickedFile.readAsBytes();
       setState(() {
+        filepath = pickedFile.path;
         image = Image(image: XFileImage(pickedFile));
         debugPrint("Gallery Image");
-        processImage();
       });
     }
   }
@@ -214,25 +246,21 @@ class _commonUIState extends State<commonUI> {
                 customCamera(camera_to_use: widget.cameraToUse)));
 
     if (filePath != null) {
-      filepath = filePath;
       Uint8List imageByte = await File(filePath as String).readAsBytes();
       setState(() {
+        filepath = filePath;
         image = Image.file(File(filePath));
         debugPrint("Camera Image");
-        processImage();
       });
     }
   }
 
-  void processImage() async {
-    print("Inside process");
-    img.Image imageInput = img.decodeImage(File(filepath!).readAsBytesSync())!;
-    var pred = _classifier.predict(imageInput);
-    setState(() {
-      this.category = pred;
-    });
-    print("Pred " + pred.toString());
-    print(category!.label);
-    print(category!.score.toStringAsFixed(3));
+  void translateText(String string) async {
+    print("Inside Translate");
+    final onDeviceTranslator = OnDeviceTranslator(
+        sourceLanguage: TranslateLanguage.english,
+        targetLanguage: TranslateLanguage.hindi);
+    final String response = await onDeviceTranslator.translateText(string);
+    print("Take bro " + response);
   }
 }

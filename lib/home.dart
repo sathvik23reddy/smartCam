@@ -25,7 +25,8 @@ class _HomeState extends State<Home> {
         title: Text("Smart Camera"),
         backgroundColor: Colors.purple,
       ),
-      body: commonUI(cameraToUse: widget.cameraToUse),
+      body:
+          commonUI(cameraToUse: widget.cameraToUse, pageIndex: _selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

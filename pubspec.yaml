@@ -39,6 +39,8 @@ dependencies:
   cross_file_image: ^1.0.0
   camera: ^0.10.3+2
   tflite_flutter_helper: ^0.2.1
+  google_mlkit_text_recognition: ^0.5.0
+  google_mlkit_translation: ^0.5.0
 
 dev_dependencies:
   flutter_test:
