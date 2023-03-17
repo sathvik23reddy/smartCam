@@ -37,7 +37,7 @@ class _textDetectState extends State<textDetect> {
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
         for (TextElement element in line.elements) {
-          buffer.write(element.text);
+          buffer.write(element.text+ " ");
         }
       }
       break;
