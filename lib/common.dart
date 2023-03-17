@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:smart_cam/tflite/classifier.dart';
@@ -20,6 +22,7 @@ class commonUI extends StatefulWidget {
 }
 
 class _commonUIState extends State<commonUI> {
+  //List of Languages supported
   late List<String> languages = [
     'Please select target language',
     'Albanian',
@@ -51,33 +54,38 @@ class _commonUIState extends State<commonUI> {
   late Classifier _classifier;
   late int curPage;
 
+  //Called upon initialisation, helps setup Classifier and set other values to Null
   @override
   void initState() {
     super.initState();
     image = null;
     filepath = null;
-
     curPage = widget.pageIndex;
     _classifier = ClassifierQuant();
   }
 
+  //Called when Widget is disposed
   @override
   void dispose() {
     image = null;
     filepath = null;
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    //Variables holding screenWidth and screenHeight (Relative to each device)
     final screenWidth = MediaQuery.of(context).size.width,
         screenHeight = MediaQuery.of(context).size.height;
+
+    //Updates current page to help reset Image
     if (curPage != widget.pageIndex) {
       curPage = widget.pageIndex;
       image = null;
       filepath = null;
     }
+
+    //Common UI Widget
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -89,6 +97,7 @@ class _commonUIState extends State<commonUI> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
+                //Drop Down Button
                 child: DropdownButton<String>(
                   value: dropdownValue,
                   icon: const Icon(Icons.arrow_drop_down),
@@ -118,6 +127,7 @@ class _commonUIState extends State<commonUI> {
                       .toList(),
                 ),
               ),
+              //Insert Image Box
               Column(
                 children: [
                   image == null
@@ -146,15 +156,16 @@ class _commonUIState extends State<commonUI> {
                         )
                 ],
               ),
+              //Results section (Unique to each mode)
               widget.pageIndex == 0
                   ? filepath == null
-                      ? SizedBox()
+                      ? Container()
                       : objDetect(
                           filepath: filepath,
                           classifier: _classifier,
                           language: dropdownValue)
                   : filepath == null
-                      ? SizedBox()
+                      ? Container()
                       : textDetect(filepath: filepath, language: dropdownValue)
             ],
           ),
@@ -163,6 +174,7 @@ class _commonUIState extends State<commonUI> {
     );
   }
 
+  //Image Picker
   Widget getImageBox(String name, double screenWidth, double screenHeight) {
     return GestureDetector(
       onTap: () => dialogBox(),
@@ -181,6 +193,7 @@ class _commonUIState extends State<commonUI> {
     );
   }
 
+  //Pop up window to get Gallery/Camera prompt
   Future dialogBox() {
     return showDialog(
         context: context,
@@ -239,6 +252,7 @@ class _commonUIState extends State<commonUI> {
         });
   }
 
+  //Function to get image from Gallery
   _getFromGallery() async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
@@ -246,7 +260,6 @@ class _commonUIState extends State<commonUI> {
       maxHeight: 1800,
     );
     if (pickedFile != null) {
-      Uint8List imageByte = await pickedFile.readAsBytes();
       setState(() {
         filepath = pickedFile.path;
         image = Image(image: XFileImage(pickedFile));
@@ -255,6 +268,7 @@ class _commonUIState extends State<commonUI> {
     }
   }
 
+  //Function to get image from Camera
   _getFromCamera() async {
     final filePath = await Navigator.push(
         context,
@@ -263,7 +277,6 @@ class _commonUIState extends State<commonUI> {
                 customCamera(camera_to_use: widget.cameraToUse)));
 
     if (filePath != null) {
-      Uint8List imageByte = await File(filePath as String).readAsBytes();
       setState(() {
         filepath = filePath;
         image = Image.file(File(filePath));

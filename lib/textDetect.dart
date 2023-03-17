@@ -23,29 +23,23 @@ class _textDetectState extends State<textDetect> {
   Widget build(BuildContext context) {
     return SizedBox(
         child: result == null
-            ? (Text(""))
+            ? Container()
             : Results(resultEng: result!, targetLanguage: widget.language));
   }
 
+  //Processes the image to identify block of text and returns it
   void processText() async {
-    print("Inside process Text");
     final InputImage inputImage = InputImage.fromFilePath(widget.filepath!);
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     final RecognizedText recognizedText =
         await textRecognizer.processImage(inputImage);
-
-    String text = recognizedText.text;
     var buffer = StringBuffer();
     for (TextBlock block in recognizedText.blocks) {
-      final String text = block.text;
-      final List<String> languages = block.recognizedLanguages;
-      String ret = "";
       for (TextLine line in block.lines) {
         for (TextElement element in line.elements) {
           buffer.write(element.text);
         }
       }
-      ret = buffer.toString();
       break;
     }
     setState(() {

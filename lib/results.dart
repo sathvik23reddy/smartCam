@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class Results extends StatefulWidget {
@@ -28,10 +25,11 @@ class _ResultsState extends State<Results> {
     final screenWidth = MediaQuery.of(context).size.width,
         screenHeight = MediaQuery.of(context).size.height;
 
+    //Output Widget
     return isLoading
         ? SizedBox(
             height: screenHeight / 3.5,
-            child: Center(child: CircularProgressIndicator()))
+            child: const Center(child: CircularProgressIndicator()))
         : Column(children: [
             Padding(
               padding:
@@ -42,14 +40,14 @@ class _ResultsState extends State<Results> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         "English: ",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 25),
                       ),
                       GestureDetector(
                           onTap: () => speakText(widget.resultEng),
-                          child: Icon(
+                          child: const Icon(
                             Icons.volume_down_alt,
                             size: 35,
                           ))
@@ -58,13 +56,13 @@ class _ResultsState extends State<Results> {
                   Text(
                     widget.resultEng,
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 21),
+                    style: const TextStyle(fontSize: 21),
                   )
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(30, 15, 30, 15),
               child: Divider(color: Colors.black, height: 4),
             ),
             Padding(
@@ -80,12 +78,12 @@ class _ResultsState extends State<Results> {
                         widget.targetLanguage == "Please select target language"
                             ? "English: "
                             : "${widget.targetLanguage}: ",
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 25),
                       ),
                       GestureDetector(
                           onTap: () => speakText(resultGoalLang!),
-                          child: Icon(
+                          child: const Icon(
                             Icons.volume_down_alt,
                             size: 35,
                           ))
@@ -94,7 +92,7 @@ class _ResultsState extends State<Results> {
                   Text(
                     resultGoalLang!,
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 21),
+                    style: const TextStyle(fontSize: 21),
                   )
                 ],
               ),
@@ -102,6 +100,7 @@ class _ResultsState extends State<Results> {
           ]);
   }
 
+  //Translates text to desired goalLanguage
   void translateText(String result, String goalLanguage) async {
     setState(() {
       isLoading = true;
@@ -131,7 +130,6 @@ class _ResultsState extends State<Results> {
       'Tamil': TranslateLanguage.tamil,
       'Turkish': TranslateLanguage.turkish
     };
-    print("Inside Translate");
     final onDeviceTranslator = OnDeviceTranslator(
         sourceLanguage: TranslateLanguage.english,
         targetLanguage: languageMap[goalLanguage]);
@@ -140,15 +138,10 @@ class _ResultsState extends State<Results> {
       isLoading = false;
       resultGoalLang = response;
     });
-    print("Take bro " + response);
   }
 
+  //Text to speech
   void speakText(String resultEng) async {
     var result = await ftts.speak(resultEng);
-    if (result == 1) {
-      //speaking
-    } else {
-      //not speaking
-    }
   }
 }

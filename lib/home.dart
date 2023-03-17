@@ -12,6 +12,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
 
+  //To update the selectedIndex (Page) value
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -21,12 +22,15 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //Top App Bar
       appBar: AppBar(
-        title: Text("Smart Camera"),
+        title: const Text("Smart Camera"),
         backgroundColor: Colors.purple,
       ),
+      //Common UI contains all common elements like Drop Down Menu & Image Chooser
       body:
           commonUI(cameraToUse: widget.cameraToUse, pageIndex: _selectedIndex),
+      //Bottom Nav Bar to switch between 2 modes
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

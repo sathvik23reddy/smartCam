@@ -28,6 +28,7 @@ class __cameraState extends State<customCamera> {
     super.dispose();
   }
 
+  //Widget to launch Camera and help capture image
   @override
   Widget build(BuildContext context) {
     return Scaffold(

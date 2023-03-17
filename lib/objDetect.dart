@@ -27,24 +27,21 @@ class _objDetectState extends State<objDetect> {
     processImage();
     return SizedBox(
         child: result == null
-            ? (Text(""))
+            ? Container()
             : Results(
                 resultEng: result!,
                 targetLanguage: widget.language,
               ));
   }
 
+  //Processes the image using TFLite model, assigns output to result variable
   void processImage() async {
-    print("Inside process");
     img.Image imageInput =
         img.decodeImage(File(widget.filepath!).readAsBytesSync())!;
     var pred = widget.classifier.predict(imageInput);
     setState(() {
-      this.category = pred;
+      category = pred;
     });
-    print("Pred " + pred.toString());
-    print(category!.label);
-    print(category!.score.toStringAsFixed(3));
     setState(() {
       result = category!.label;
     });
