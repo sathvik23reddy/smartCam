@@ -5,7 +5,6 @@ import 'package:smart_cam/tflite/classifier_quant.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:cross_file_image/cross_file_image.dart';
-import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_cam/cam.dart';
 import 'package:smart_cam/objDetect.dart';
@@ -23,8 +22,28 @@ class commonUI extends StatefulWidget {
 class _commonUIState extends State<commonUI> {
   late List<String> languages = [
     'Please select target language',
+    'Albanian',
+    'Bengali',
+    'Chinese',
+    'Croatian',
+    'Dutch',
     'English',
-    'Hindi'
+    'Finnish',
+    'French',
+    'German',
+    'Greek',
+    'Gujarati',
+    'Hindi',
+    'Hungarian',
+    'Indonesian',
+    'Irish',
+    'Italian',
+    'Japanese',
+    'Kannada',
+    'Korean',
+    'Spanish',
+    'Tamil',
+    'Turkish'
   ];
   late String dropdownValue = languages.first;
   Image? image;
@@ -61,86 +80,84 @@ class _commonUIState extends State<commonUI> {
     }
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox(
-              height: screenHeight / 25,
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: DropdownButton<String>(
-                value: dropdownValue,
-                icon: const Icon(Icons.arrow_drop_down),
-                elevation: 16,
-                alignment: Alignment.center,
-                style: const TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 2,
-                  color: Colors.deepPurpleAccent,
+        body: Padding(
+          padding:
+              EdgeInsets.fromLTRB(0, screenHeight / 18, 0, screenHeight / 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
+                child: DropdownButton<String>(
+                  value: dropdownValue,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  elevation: 16,
+                  alignment: Alignment.center,
+                  style:
+                      const TextStyle(color: Colors.deepPurple, fontSize: 18),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      dropdownValue = value!;
+                      image = null;
+                      filepath = null;
+                    });
+                  },
+                  items: languages
+                      .map((value) => DropdownMenuItem(
+                            value: value,
+                            child: SizedBox(
+                              width: screenWidth / 1.4,
+                              child: Text(value, textAlign: TextAlign.center),
+                            ),
+                          ))
+                      .toList(),
                 ),
-                onChanged: (String? value) {
-                  setState(() {
-                    dropdownValue = value!;
-                    image = null;
-                    filepath = null;
-                  });
-                },
-                items: languages
-                    .map((value) => DropdownMenuItem(
-                          value: value,
-                          child: SizedBox(
-                            width: screenWidth / 1.4,
-                            child: Text(value, textAlign: TextAlign.center),
-                          ),
-                        ))
-                    .toList(),
               ),
-            ),
-            SizedBox(
-              height: screenHeight / 6,
-            ),
-            Column(
-              children: [
-                image == null
-                    ? getImageBox("Insert Image", screenWidth, screenHeight)
-                    : SizedBox(
-                        width: screenWidth,
-                        height: screenHeight / 3.34,
-                        child: image),
-                image == null
-                    ? Container()
-                    : Center(
-                        child: TextButton(
-                          child: const Text(
-                            "Choose a different image",
-                            style: TextStyle(color: Colors.purple),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              image = null;
-                              filepath = null;
+              Column(
+                children: [
+                  image == null
+                      ? getImageBox("Insert Image", screenWidth, screenHeight)
+                      : SizedBox(
+                          width: screenWidth,
+                          height: screenHeight / 3.34,
+                          child: image),
+                  image == null
+                      ? Container()
+                      : Center(
+                          child: TextButton(
+                            child: const Text(
+                              "Choose a different image",
+                              style: TextStyle(color: Colors.purple),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                image = null;
+                                filepath = null;
 
-                              dialogBox();
-                            });
-                          },
-                        ),
-                      )
-              ],
-            ),
-            widget.pageIndex == 0
-                ? filepath == null
-                    ? SizedBox(
-                        height: screenHeight / 3.5,
-                      )
-                    : objDetect(filepath: filepath, classifier: _classifier)
-                : filepath == null
-                    ? SizedBox(
-                        height: screenHeight / 3.5,
-                      )
-                    : textDetect(filepath: filepath)
-          ],
+                                dialogBox();
+                              });
+                            },
+                          ),
+                        )
+                ],
+              ),
+              widget.pageIndex == 0
+                  ? filepath == null
+                      ? SizedBox()
+                      : objDetect(
+                          filepath: filepath,
+                          classifier: _classifier,
+                          language: dropdownValue)
+                  : filepath == null
+                      ? SizedBox()
+                      : textDetect(filepath: filepath, language: dropdownValue)
+            ],
+          ),
         ),
       ),
     );
@@ -253,14 +270,5 @@ class _commonUIState extends State<commonUI> {
         debugPrint("Camera Image");
       });
     }
-  }
-
-  void translateText(String string) async {
-    print("Inside Translate");
-    final onDeviceTranslator = OnDeviceTranslator(
-        sourceLanguage: TranslateLanguage.english,
-        targetLanguage: TranslateLanguage.hindi);
-    final String response = await onDeviceTranslator.translateText(string);
-    print("Take bro " + response);
   }
 }

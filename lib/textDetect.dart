@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:smart_cam/results.dart';
 
 class textDetect extends StatefulWidget {
-  textDetect({super.key, required this.filepath});
+  textDetect({super.key, required this.filepath, required this.language});
   String? filepath;
+  String language;
   @override
   State<textDetect> createState() => _textDetectState();
 }
@@ -19,7 +21,10 @@ class _textDetectState extends State<textDetect> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(child: result == null ? (Text("")) : Text(result!));
+    return SizedBox(
+        child: result == null
+            ? (Text(""))
+            : Results(resultEng: result!, targetLanguage: widget.language));
   }
 
   void processText() async {

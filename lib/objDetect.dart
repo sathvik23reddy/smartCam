@@ -1,12 +1,18 @@
 import 'dart:io';
+import 'package:smart_cam/results.dart';
 import 'package:smart_cam/tflite/classifier.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 class objDetect extends StatefulWidget {
-  objDetect({super.key, required this.filepath, required this.classifier});
+  objDetect(
+      {super.key,
+      required this.filepath,
+      required this.classifier,
+      required this.language});
   final String? filepath;
+  String language;
   final Classifier classifier;
   @override
   State<objDetect> createState() => _objDetectState();
@@ -19,7 +25,13 @@ class _objDetectState extends State<objDetect> {
   @override
   Widget build(BuildContext context) {
     processImage();
-    return SizedBox(child: result == null ? (Text("")) : Text(result!));
+    return SizedBox(
+        child: result == null
+            ? (Text(""))
+            : Results(
+                resultEng: result!,
+                targetLanguage: widget.language,
+              ));
   }
 
   void processImage() async {
